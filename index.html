@@ -2,7 +2,10 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>应援灯牌</title>
 <script src="qrcode.js"></script>
 <style>
@@ -68,12 +71,17 @@
   .bigbtn:active{transform:scale(.98)}
 
   /* ===== 灯牌全屏 ===== */
-  #sign{position:fixed;inset:0;z-index:40;display:none;justify-content:center;align-items:center;overflow:hidden;cursor:pointer;background:#000}
+  #sign{position:fixed;top:0;left:0;width:100%;width:100dvw;height:100%;height:100vh;height:100dvh;z-index:40;display:none;justify-content:center;align-items:center;overflow:hidden;cursor:pointer;background:#000;touch-action:none;-webkit-user-select:none;user-select:none}
   #sign.active{display:flex}
-  #bgLayer{position:absolute;inset:0}
+  #bgLayer{position:absolute;inset:0;width:100%;height:100%}
   #txt{position:relative;color:#fff;z-index:2;text-align:center;white-space:pre-line;font-weight:900;padding:0 5vw}
   .exit-btn{position:absolute;top:16px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.4);color:rgba(255,255,255,.75);border:1px solid rgba(255,255,255,.25);border-radius:24px;padding:8px 18px;font-size:13px;letter-spacing:1px;backdrop-filter:blur(4px);z-index:50;cursor:pointer}
   .exit-btn.hidden{display:none}
+  .ios-hint{position:absolute;bottom:26px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.55);color:#fff;border:1px solid rgba(255,255,255,.2);border-radius:14px;padding:10px 16px;font-size:13px;line-height:1.5;text-align:center;max-width:88%;backdrop-filter:blur(6px);z-index:60;transition:opacity .3s}
+  .ios-hint.hidden{display:none;opacity:0}
+  /* iOS Safari: 全屏时遮住(避免漏白/缩放, 并锁住地址栏收起) */
+  body.fullscreen{position:fixed;inset:0;overscroll-behavior:none;height:100dvh;height:100vh}
+  body.fullscreen #sign{display:flex}
 
   @keyframes breathe{0%,100%{opacity:.45}50%{opacity:1}}
   @keyframes blinkstep{0%,49%{opacity:1}50%,100%{opacity:0}}
@@ -81,6 +89,16 @@
   @keyframes wave{0%,100%{transform:scaleY(1)}50%{transform:scaleY(.72)}}
   @keyframes colorcycle{0%{filter:hue-rotate(0deg)}100%{filter:hue-rotate(360deg)}}
   @keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(.88)}}
+  /* ── 新增动画 ── */
+  @keyframes zoombounce{0%,100%{transform:scale(1)}20%{transform:scale(1.35)}40%{transform:scale(.96)}55%{transform:scale(1.1)}70%{transform:scale(.99)}}
+  @keyframes sway{0%,100%{transform:rotate(-6deg)}50%{transform:rotate(6deg)}}
+  @keyframes flicker{0%,100%{opacity:1}25%{opacity:.35}40%{opacity:.9}60%{opacity:.2}75%{opacity:1}}
+  @keyframes blur{0%,100%{filter:blur(0) brightness(1.3)} }
+  @keyframes rise{0%{transform:scale(1)}25%{transform:translateY(-4%) scale(1.06)}50%{transform:translateY(0)} }
+  @keyframes matrix{0%,100%{opacity:1}50%{opacity:.1}}
+  @keyframes spinwiggle{0%,100%{transform:scale(1) rotate(-8deg)}50%{transform:scale(1.03) rotate(8deg)}}
+  @keyframes rain{0%,100%{transform:translateY(-2%)}50%{transform:translateY(2%)}}
+  @keyframes conc_all{0%{filter:hue-rotate(0) brightness(1)}30%{filter:hue-rotate(120deg) brightness(1.6)}60%{filter:hue-rotate(240deg) brightness(.85)}100%{filter:hue-rotate(360deg) brightness(1)}}
 </style>
 </head>
 <body>
@@ -133,6 +151,12 @@
       <div class="anim-card" data-anim="wave"><div class="ico">🌊</div><div class="nm">波动</div><div class="ds">上下起伏</div></div>
       <div class="anim-card" data-anim="cycle"><div class="ico">🎡</div><div class="nm">换色</div><div class="ds">循环色相</div></div>
       <div class="anim-card" data-anim="pulse"><div class="ico">💓</div><div class="nm">心跳</div><div class="ds">缩放脉动</div></div>
+      <div class="anim-card" data-anim="bounce"><div class="ico">🟣</div><div class="nm">弹跳</div><div class="ds">弹力冲击</div></div>
+      <div class="anim-card" data-anim="swing"><div class="ico">🎊</div><div class="nm">摇摆</div><div class="ds">荧光棒摆动</div></div>
+      <div class="anim-card" data-anim="flicker"><div class="ico">🕯️</div><div class="nm">烛火</div><div class="ds">不规则明灭</div></div>
+      <div class="anim-card" data-anim="rise"><div class="ico">🆙</div><div class="nm">起伏</div><div class="ds">上下起伏</div></div>
+      <div class="anim-card" data-anim="rainbow"><div class="ico">🌈</div><div class="nm">潮涌</div><div class="ds">斑斓呼吸</div></div>
+      <div class="anim-card" data-anim="spin"><div class="ico">🌀</div><div class="nm">舞动</div><div class="ds">摇摆缩放</div></div>
     </div>
   </div>
 
@@ -173,6 +197,7 @@
   <div id="bgLayer"></div>
   <div id="txt"></div>
   <div class="exit-btn hidden" id="exitBtn">✕ 退出</div>
+  <div class="ios-hint hidden" id="iosHint">🖐️ 提示：点底部"分享"→"添加到主屏幕"，从桌面进入可获真全屏，无浏览器框。</div>
 </div>
 
 <script>
@@ -307,6 +332,13 @@ function update(){
   else if(A==='cycle')txt.style.animation='colorcycle 3s linear infinite';
   else if(A==='pulse')txt.style.animation='pulse 1.2s ease-in-out infinite';
   else if(A==='scroll')startScroll();
+  /* 新增动画 */
+  else if(A==='bounce')txt.style.animation='zoombounce 1.1s ease-in-out infinite';
+  else if(A==='swing')txt.style.animation='sway 1.4s ease-in-out infinite';
+  else if(A==='flicker')txt.style.animation='flicker 1.8s linear infinite';
+  else if(A==='rise')txt.style.animation='rain 2s ease-in-out infinite';
+  else if(A==='rainbow')txt.style.animation='conc_all 1.8s linear infinite'; 
+  else if(A==='spin')txt.style.animation='spinwiggle 1.2s ease-in-out infinite';
 }
 
 /* ---- 跑马灯 ---- */
@@ -333,19 +365,42 @@ function startScroll(){
 
 /* ---- 显示/隐藏 ---- */
 const exitBtn=$('exitBtn');
+// 判断 iOS Safari (无标准 Fullscreen API, "添加到主屏幕"才有真全屏)
+function isIOS(){
+  return /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+}
+function isStandalone(){ // 已"添加到主屏幕"的独立模式
+  return window.navigator.standalone===true || window.matchMedia('(display-mode: standalone)').matches;
+}
+function tryFullscreen(){
+  // 桌面/安卓真全屏
+  if(document.documentElement.requestFullscreen)return document.documentElement.requestFullscreen().catch(()=>false);
+  if(document.documentElement.webkitRequestFullscreen)return document.documentElement.webkitRequestFullscreen().catch(()=>false);
+  return Promise.resolve(false);
+}
 function showSign(){
   stopScroll();
   $('sign').classList.add('active');
   $('panel').style.display='none';
-  if(document.documentElement.requestFullscreen)document.documentElement.requestFullscreen().catch(()=>{});
+  document.body.classList.add('fullscreen');       // 触发 CSS 覆满 + 锁滚动
+  tryFullscreen();
   try{screen.orientation&&screen.orientation.lock&&screen.orientation.lock('portrait').catch(()=>{});}catch(e){}
   exitBtn.classList.remove('hidden');
+  // iOS: 若没独立成 app, 提示一次"添加到主屏幕"获得真全屏
+  if(isIOS() && !isStandalone()){
+    $('iosHint').classList.remove('hidden');
+    setTimeout(function(){ $('iosHint').classList.add('hidden'); }, 3500);
+  } else {
+    $('iosHint').classList.add('hidden');
+  }
   update();
 }
 function hideSign(){
   $('sign').classList.remove('active');
   $('panel').style.display='flex';
+  document.body.classList.remove('fullscreen');
   if(document.exitFullscreen)document.exitFullscreen().catch(()=>{});
+  if(document.webkitExitFullscreen)document.webkitExitFullscreen().catch(()=>{});
   try{screen.orientation&&screen.orientation.unlock&&screen.orientation.unlock();}catch(e){}
   stopScroll();
   txt.style.position='relative';txt.style.left='auto';txt.style.top='auto';
@@ -364,7 +419,7 @@ function applyFromURL(){
     if(q.has('text')){ S.text=q.get('text'); $('textInput').value=S.text; changed=true; }
     if(q.has('color')&&/^[0-9a-fA-F]{6}$/.test(q.get('color'))){ S.mode=S.color='#'+q.get('color'); changed=true;
       document.querySelectorAll('.swatch').forEach(s=>s.classList.remove('sel')); }
-    if(q.has('anim')&&['static','breathe','blink','blinksoft','scroll','wave','cycle','pulse'].includes(q.get('anim'))){ S.anim=q.get('anim');
+    if(q.has('anim')&&['static','breathe','blink','blinksoft','scroll','wave','cycle','pulse','bounce','swing','flicker','rise','rainbow','spin'].includes(q.get('anim'))){ S.anim=q.get('anim');
       animCards.forEach(x=>x.classList.toggle('sel',x.dataset.anim===S.anim)); changed=true; }
     if(changed){ update(); }
   }catch(e){}
